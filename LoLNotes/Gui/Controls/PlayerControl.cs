@@ -271,15 +271,29 @@ namespace LoLNotes.Gui.Controls
 			var layout = new TableLayoutPanel();
 			layout.Dock = DockStyle.Fill;
 			foreach (var champ in champs)
-			{
+			{    
 				if (champ.ChampionId == 0)
 					continue;
+
+                int wins = 0;
+                int losses = 0;
+                foreach (var stat in champ.Stats)
+                {
+                    if (stat.StatType == "TOTAL_SESSIONS_WON")
+                    {
+                        wins = Convert.ToInt32(stat.Value);
+                    }
+                    else if (stat.StatType == "TOTAL_SESSIONS_LOST")
+                    {
+                        losses = Convert.ToInt32(stat.Value);
+                    }
+                }
 
 				var lbl = new Label
 				{
 					Font = new Font("Bitstream Vera Sans Mono", 8.25F, FontStyle.Bold),
 					AutoSize = true,
-					Text = string.Format("{0} ({1})", ChampNames.Get(champ.ChampionId), champ.TotalGamesPlayed)
+					Text = string.Format("{0} {1} ({2}%)", ChampNames.Get(champ.ChampionId), champ.TotalGamesPlayed, Math.Round(wins/(double)(wins + losses)*100, 2))
 				};
 				layout.Controls.Add(lbl);
 			}
@@ -334,7 +348,14 @@ namespace LoLNotes.Gui.Controls
 					var left = game.Leaver;
 					var botgame = game.QueueType == "BOT";
 
-					var wonlabel = CreateLabel(string.Format("{0}{1}", left ? "[L] " : "", won ? "Won" : "Lost"));
+                    bool ranked = false;
+
+                    if (game.QueueType == "RANKED_SOLO_5x5")
+                    {
+                        ranked = true;
+                    }
+
+					var wonlabel = CreateLabel(string.Format("{0}{1}{2}", left ? "[L] " : "", ranked ? "[RS] " : "", won ? "Won" : "Lost"));
 					wonlabel.ForeColor = won ? Color.Green : Color.Red;
 
 					var kdrlbl = CreateLabel(string.Format("({0}/{1}/{2})", kills, deaths, assists));
@@ -493,7 +514,7 @@ namespace LoLNotes.Gui.Controls
 			string url = null;
 			if (e.Button == MouseButtons.Left)
 			{
-				url = string.Format("http://www.lolking.net/summoner/{0}/{1}", region, plr.Item1);
+				url = string.Format("http://www.lolking.net/summoner/{0}/{1}", region, plr.Item1);                
 			}
 			else if (e.Button == MouseButtons.Middle)
 			{

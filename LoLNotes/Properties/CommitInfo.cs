@@ -1,3 +1,3 @@
-[assembly: AssemblyCommit("commit 3106fff7b6f556c2442ff9b6b1f1a868eae620d0\nAuthor: high <high828@gmail.com>\nDate:   Thu Mar 8 19:22:56 2012 -0500\n\n    Fixed crash when stats are not received.\n", "3106fff7b6f556c2442ff9b6b1f1a868eae620d0", "high", "  Thu Mar 8 19:22:56 2012 -0500", "Fixed crash when stats are not received.", "high828@gmail.com")]
+[assembly: AssemblyCommit("commit 7f5877b0fda7490e90581e5c5d9f2fe514269145\nAuthor: high <high828@gmail.com>\nDate:   Tue Jun 12 13:53:36 2012 -0400\n\n    Fixed MessageTranslator matching names with Contains instead of EndsWith causing some collisions.\n", "7f5877b0fda7490e90581e5c5d9f2fe514269145", "high", "  Tue Jun 12 13:53:36 2012 -0400", "Fixed MessageTranslator matching names with Contains instead of EndsWith causing some collisions.", "high828@gmail.com")]
 
 								

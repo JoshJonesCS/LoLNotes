@@ -54,6 +54,7 @@ using LoLNotes.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NotMissing.Logging;
+using LoLNotes.Messages.Statistics;
 
 namespace LoLNotes.Gui
 {
@@ -558,6 +559,54 @@ namespace LoLNotes.Gui
 			var teams = new List<TeamParticipants> { lobby.TeamOne, lobby.TeamTwo };
 			var lists = new List<TeamControl> { teamControl1, teamControl2 };
 
+            // Loop through teams
+            for (int i = 0; i < lists.Count; i++)
+            {
+                var list = lists[i];
+                var team = teams[i];
+                var cumElo = 0;
+                List<int> indivElo = new List<int>();
+
+                // Loop through players
+                for (int j = 0; j < list.Players.Count; j++)
+                {
+                    // Get the player
+                    var player = team[j] as PlayerParticipant;
+
+                    if (player != null && player.SummonerId != 0)
+                    {
+                        var cmd = new PlayerCommands(Connection);
+                        var summoner = cmd.GetPlayerByName(player.Name);
+                        if (summoner != null)
+                        {
+                            // Get their stats
+                            PlayerStatSummaryList summarySet = cmd.RetrievePlayerStatsByAccountId(summoner.AccountId).PlayerStatSummaries.PlayerStatSummarySet;
+                            
+                            // Add player's rating to the team rating
+                            foreach (var stat in summarySet)
+                            {
+                                if (stat.PlayerStatSummaryType == "RankedSolo5x5")
+                                {
+                                    cumElo += stat.Rating;
+                                    indivElo.Add(stat.Rating);
+                                }
+                            }
+                        }
+                    }                    
+                }
+
+                if (i == 0)
+                {
+                    Team1Elo.Text = "Team 1 Elo: " + Math.Round(cumElo / 5.0, 0).ToString();
+                    Elos1.Text = "Elos: " + string.Join(", ", indivElo.OrderByDescending(v => v).ToArray());
+                }
+                else
+                {
+                    Team2Elo.Text = "Team 2 Elo: " + Math.Round(cumElo / 5.0, 0).ToString();
+                    Elos2.Text = "Elos: " + string.Join(", ", indivElo.OrderByDescending(v => v).ToArray());
+                }
+            }
+
 			using (new SuspendLayout(this))
 			{
 				for (int i = 0; i < lists.Count; i++)
@@ -571,7 +620,7 @@ namespace LoLNotes.Gui
 						continue;
 					}
 					list.Visible = true;
-
+                    
 					for (int o = 0; o < list.Players.Count; o++)
 					{
 						if (o < team.Count)
@@ -579,7 +628,7 @@ namespace LoLNotes.Gui
 							var plycontrol = list.Players[o];
 							plycontrol.Visible = true;
 							var ply = team[o] as PlayerParticipant;
-
+                            
 							if (ply != null && ply.SummonerId != 0)
 							{
 								lock (PlayersCache)
